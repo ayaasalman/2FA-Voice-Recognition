@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="index-container">
+        <h1>Two-Factor Authentication Using Voice Recognition</h1>
+        <button onclick="window.location.href='/signup'">Get Started</button>
+    </div>
+
+    <!-- <h1>Record Your Voice Saying {{ signup_r_word }}</h1>
+    <button id="start-recording">Record</button>
+    <button id="stop-recording" style="display:none;">Stop</button> -->
+
+    <!-- Audio playback controls (hidden initially) -->
+    <!-- <audio id="playback" controls style="display: none;"></audio> -->
+
+    <!-- <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        const startRecordingButton = document.getElementById('start-recording');
+        const stopRecordingButton = document.getElementById('stop-recording');
+        const playback = document.getElementById('playback');
+
+        // Start recording
+        startRecordingButton.onclick = () => {
+            console.log("Record button clicked.");
+
+            // Reset audioChunks for the new recording
+            audioChunks = [];
+
+            // Hide the record button and show stop button
+            startRecordingButton.style.display = 'none';
+            stopRecordingButton.style.display = 'inline';
+
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    console.log("Microphone access granted!");
+
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = event => {
+                        console.log("Audio chunk received.");
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        console.log("Recording stopped.");
+
+                        // Combine audio chunks into a single Blob
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioURL = URL.createObjectURL(audioBlob);
+
+                        // Reset the audio element to ensure it plays the new recording
+                        playback.src = audioURL;
+
+                        // Show the audio controls
+                        playback.style.display = 'block';
+
+                        // Send audio to Flask backend
+                        uploadAudio(audioBlob);
+                    };
+
+                    mediaRecorder.start();
+                    console.log("Recording started...");
+                })
+                .catch(error => {
+                    console.error("Error accessing microphone:", error);
+                    alert("Unable to access your microphone. Please check your permissions.");
+                });
+        };
+
+        // Stop recording
+        stopRecordingButton.onclick = () => {
+            console.log("Stop button clicked.");
+            mediaRecorder.stop();
+
+            // Hide stop button and show the record button
+            startRecordingButton.style.display = 'inline';
+            stopRecordingButton.style.display = 'none';
+        };
+
+        // Function to upload audio file to Flask
+        function uploadAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'recording.wav');
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("File uploaded successfully:", data);
+            })
+            .catch(error => {
+                console.error("Error uploading file:", error);
+            });
+        }
+    </script> -->
+</body>
+</html>

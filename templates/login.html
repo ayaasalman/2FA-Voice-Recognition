@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form action="/submit_login" method="POST" class="form">
+            <label for="username">Username or Email:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        <!-- Display error message if needed -->
+        <!-- <div class="error"> -->
+            <!-- Error message can be dynamically added here -->
+            <!-- {% if error_message %}
+                <p>{{ error_message }}</p>
+            {% endif %}
+        </div> -->
+    </div>
+</body>
+</html>

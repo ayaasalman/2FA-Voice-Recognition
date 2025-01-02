@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authenticate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Sign Up</h2>
+        <form action="/submit_authenticate_signup" method="POST" class="form" id="authenticate-form">
+
+            <!-- Display the random word to record -->
+            <label for="random_word">Record the word:</label>
+            <input type="text" id="username" name="username" value="{{username}}" readonly>
+            <input type="text" id="random_word" name="random_word" value="{{signup_r_word}}" readonly>
+
+            <!-- Buttons for recording -->
+            <button id="start-recording">Record</button>
+            <button id="stop-recording" style="display:none;">Stop</button>
+
+            <!-- Submit button -->
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob = null; // Store the recorded audio
+
+        const startRecordingButton = document.getElementById('start-recording');
+        const stopRecordingButton = document.getElementById('stop-recording');
+        const authenticateForm = document.getElementById('authenticate-form');
+
+        // Start Recording
+        startRecordingButton.onclick = (e) => {
+            e.preventDefault(); // Prevent default button behavior
+            console.log("Record button clicked.");
+
+            audioChunks = []; // Reset for each new recording
+
+            startRecordingButton.style.display = 'none'; // Hide "Record" button
+            stopRecordingButton.style.display = 'inline'; // Show "Stop" button
+
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    console.log("Microphone access granted!");
+
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        console.log("Audio chunk received.");
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        console.log("Recording stopped.");
+
+                        // Combine the chunks into a single Blob
+                        audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        console.log("Audio Blob ready.");
+                    };
+
+                    mediaRecorder.start();
+                    console.log("Recording started...");
+                })
+                .catch(error => {
+                    console.error("Error accessing microphone:", error);
+                    alert("Unable to access microphone. Please check your permissions.");
+                });
+        };
+
+        // Stop Recording
+        stopRecordingButton.onclick = (e) => {
+            e.preventDefault();
+            console.log("Stop button clicked.");
+            mediaRecorder.stop();
+
+            startRecordingButton.style.display = 'inline'; // Show "Record" button
+            stopRecordingButton.style.display = 'none'; // Hide "Stop" button
+        };
+
+        // Handle Form Submission
+        authenticateForm.onsubmit = (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            if (!audioBlob) {
+                alert("Please record your voice before authenticating.");
+                return;
+            }
+
+            // Prepare FormData
+            const formData = new FormData();
+            // const randomWord = document.getElementById('random_word').value;
+
+            // formData.append('random_word', randomWord);
+            formData.append('file', audioBlob, 'authentication_recording.wav');
+
+            // Append the username to the FormData
+            // const username = "{{ username }}"; // Grab the username passed to the template
+            // if (!username) {
+            //     alert("Username is missing!");
+            //     return;
+            // }
+            formData.append('username', "{{ username }}");
+            formData.append('email', "{{ email }}");
+            formData.append('password', "{{ password }}");
+
+            // Send data to Flask backend
+            fetch('/submit_authenticate_signup', {
+                method: 'POST',
+                body: formData
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Authentication result:", data);
+
+                if (data.success) {
+                    // Signup was successful, redirect to the login page
+                    alert(data.message); // You can show a success message here
+                    window.location.href = "/login";
+ // Redirect to the login page
+                } else {
+                    alert("Authentication failed: " + data.message);
+                }
+            })
+            .catch((error) => {
+                console.error("Error during authentication:", error);
+                alert("An error occurred during authentication. Please try again.");
+            });
+        };
+    </script>
+</body>
+</html>
