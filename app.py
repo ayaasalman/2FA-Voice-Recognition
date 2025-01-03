@@ -58,15 +58,18 @@ def extract_features(audio_path):
     # Extract MFCCs
     mfccs = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=13)
     mfccs = np.mean(mfccs, axis=1)  # Average MFCCs over time
+    print("------------------MFCCs------------------")
     print("MFCCs:", mfccs)  # Print MFCCs
     
     # Extract Spectral Contrast
     spectral_contrast = librosa.feature.spectral_contrast(y=audio, sr=sample_rate)
     spectral_contrast = np.mean(spectral_contrast, axis=1)  # Average over time
+    print("------------------SPECTRAL CONTRAST------------------")
     print("Spectral Contrast:", spectral_contrast)  # Print Spectral Contrast
     
     # Combine MFCC and Spectral Contrast
     features = np.hstack((mfccs, spectral_contrast))
+    print("------------------COMBINED FEATURES------------------")
     print("Combined Features:", features)  # Print the combined features
     
     return features
@@ -98,6 +101,7 @@ def signup():
 @app.route('/submit_signup', methods=['POST'])
 def submit_signup():
     try:
+        print("------------------NEW USER SIGNUP------------------")
         # Get form data
         username = request.form.get('username')
         email = request.form.get('email')
@@ -174,6 +178,7 @@ def submit_signup():
 
 @app.route('/signup_auth', methods=['GET', 'POST'])
 def signup_auth():
+    print("------------------SHOW EMAIL WITH CODE------------------")
     username = request.args.get('username')
     email = request.args.get('email')
     password = request.args.get('password')
@@ -184,6 +189,7 @@ def signup_auth():
 
 @app.route('/submit_authenticate_signup', methods=['POST'])
 def submit_authenticate_signup():
+    print("-----------LISTEN TO RECORDING BEFORE AND AFTER PREPROCESSING-----------")
     username = request.form.get('username')
     email = request.form.get('email')
     password = request.form.get('password')
@@ -209,10 +215,13 @@ def submit_authenticate_signup():
     dtype = features.dtype
     print(f"----------dtype is : {dtype}")
     serialized_features = features.tobytes()
+    print("------------------SERIALISED FEATURES------------------")
     print("Serialised Features:", serialized_features)
     # Encrypt the serialized features
     encrypted_features = cipher.encrypt(serialized_features)
+    print("------------------ENCRYPTED FEATURES------------------")
     print(encrypted_features)
+    print("------------------SHOW KEY GENERATION------------------")
 
     # Store features in the database
 
@@ -225,6 +234,7 @@ def submit_authenticate_signup():
     new_user.audio_features = encrypted_features  # Convert numpy array to list
     db.session.commit()
 
+    print("------------------SHOW USER IN DATABASE------------------")
     # Respond with success
     return jsonify({'success': True, 'message': 'User registered successfully!'}), 200
     # return redirect(url_for('login'))
@@ -237,6 +247,7 @@ def login():
 @app.route('/submit_login', methods=['POST'])
 def submit_login():
     try:
+        print("------------------VALIDATE USER IN DATABASE------------------")
         # Get form data
         username = request.form.get('username')
         password = request.form.get('password')
@@ -254,7 +265,7 @@ def submit_login():
         ).first()
         print(f"User found: {user}")
 
-
+        print("------------------SHOW EMAIL WITH CODE FOR LOGIN------------------")
         # Check if the user exists and the password is correct
         if user and check_password_hash(user.password_hash, password):
             subject = "Login Code"
@@ -291,7 +302,7 @@ def submit_authenticate():
         if not username or not file:
             return jsonify({'error': 'Missing required fields'}), 400
     
-        
+        print("------------------SHOW RECORDING BEFORE AND AFTER------------------")
         # Save the file directly to the uploads folder
         file_path = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(file_path)
@@ -301,6 +312,7 @@ def submit_authenticate():
         preprocess_audio(file_path, preprocessed_file_path)
 
         features = extract_features(preprocessed_file_path)
+        print("------------------EXTRACTED FEATURES------------------")
         print("Extracted Features:", features)
 
         # You can now use the 'username' variable here to compare features with the database, etc.
@@ -316,6 +328,7 @@ def submit_authenticate():
         if user:
             encrypted_features = user.audio_features  # Fetch encrypted data from DB
             decrypted_features = cipher.decrypt(encrypted_features)
+            print("------------------DECRYPTED FEATURES------------------")
             print(decrypted_features)
 
             # Get the stored features from the user
@@ -323,11 +336,14 @@ def submit_authenticate():
 
             # Convert the decrypted bytes back into a numpy array
             stored_features = np.frombuffer(decrypted_features, dtype=np.float64)  # Adjust dtype as needed 
+            print("------------------DESERIALISED FEATURES------------------")
             print("Stored Features:", stored_features)
 
+            print("------------------CHECK COSINE SIMILARITY------------------")
             similarity = cosine_similarity([features], [stored_features])  # Compare features using cosine similarity
             print(f"SIMILARITY: {similarity}")
             # You can now check the similarity result and return an appropriate response
+            print("------------------SHOW THRESHOLD------------------")
             if similarity > 0.95:  # Example threshold
                 # return redirect(url_for('homepage', username=username))
                 return jsonify({'success': True, 'message': 'User authenticated successfully!', "username": username}), 200
