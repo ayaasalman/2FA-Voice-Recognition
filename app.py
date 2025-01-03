@@ -328,7 +328,7 @@ def submit_authenticate():
             similarity = cosine_similarity([features], [stored_features])  # Compare features using cosine similarity
             print(f"SIMILARITY: {similarity}")
             # You can now check the similarity result and return an appropriate response
-            if similarity > 0.93:  # Example threshold
+            if similarity > 0.95:  # Example threshold
                 # return redirect(url_for('homepage', username=username))
                 return jsonify({'success': True, 'message': 'User authenticated successfully!', "username": username}), 200
                 # return jsonify({'username': username}), 200
