@@ -344,7 +344,7 @@ def submit_authenticate():
             print(f"SIMILARITY: {similarity}")
             # You can now check the similarity result and return an appropriate response
             print("------------------SHOW THRESHOLD------------------")
-            if similarity > 0.95:  # Example threshold
+            if similarity > 0.965:  # Example threshold
                 # return redirect(url_for('homepage', username=username))
                 return jsonify({'success': True, 'message': 'User authenticated successfully!', "username": username}), 200
                 # return jsonify({'username': username}), 200
