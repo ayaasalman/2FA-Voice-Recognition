@@ -1,5 +1,5 @@
 # Two-Factor Authentication System Using Voice Recognition
-This project is for the Information Systems Security Course at Princess Sumaya University for Technology. We created a 2FA system that uses voice recognition to authenticate users upon login to the system.
+This project is for the Information Systems Security Course at Princess Sumaya University for Technology. We created a 2FA system that uses voice recognition to authenticate users upon logging in to the system.
 
 ## How It Works
 ### Signup
@@ -18,7 +18,10 @@ When a user tries logging in, the user credentials are first validated. If the u
 1. Clone the project
 2. Import the required python libraries
 3. Generate a new key for encryption and decryption in [key-gen.py](/.key-gen.py) by running the file. Insert key in [app.py](./app.py) inside:
- ```
+```
    encryption_key = b'your-generated-key'
 ```
-4. 
+4. Run the flask app using the following command:
+```
+   flask run
+```
