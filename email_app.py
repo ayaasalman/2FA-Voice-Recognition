@@ -30,8 +30,4 @@ def send_email(to_email, subject, body):
     except Exception as e:
         print(f"Error sending email: {e}")
 
-# Usage example
-# to_email = 'ayasalman.j@gmail.com'
-# subject = 'Congratulations'
-# body = 'You have been hacked!'
-# send_email(to_email, subject, body)
+
